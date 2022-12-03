@@ -33,6 +33,26 @@ impl RockPaperScissors {
             },
         }
     }
+
+    pub fn rig(opponent: &RockPaperScissors, outcome: &GameOutcome) -> RockPaperScissors {
+        match opponent {
+            RockPaperScissors::Rock => match outcome {
+                GameOutcome::Loss => RockPaperScissors::Scissors,
+                GameOutcome::Draw => RockPaperScissors::Rock,
+                GameOutcome::Win => RockPaperScissors::Paper,
+            },
+            RockPaperScissors::Paper => match outcome {
+                GameOutcome::Loss => RockPaperScissors::Rock,
+                GameOutcome::Draw => RockPaperScissors::Paper,
+                GameOutcome::Win => RockPaperScissors::Scissors,
+            },
+            RockPaperScissors::Scissors => match outcome {
+                GameOutcome::Loss => RockPaperScissors::Paper,
+                GameOutcome::Draw => RockPaperScissors::Scissors,
+                GameOutcome::Win => RockPaperScissors::Rock,
+            },
+        }
+    }
 }
 
 #[derive(Debug, PartialEq)]
@@ -83,5 +103,12 @@ mod tests {
         assert_eq!(GameOutcome::Loss, RockPaperScissors::play(&RockPaperScissors::Scissors, &RockPaperScissors::Rock));
         assert_eq!(GameOutcome::Win, RockPaperScissors::play(&RockPaperScissors::Scissors, &RockPaperScissors::Paper));
         assert_eq!(GameOutcome::Draw, RockPaperScissors::play(&RockPaperScissors::Scissors, &RockPaperScissors::Scissors));
+    }
+
+    #[test]
+    fn rig_games() {
+        assert_eq!(RockPaperScissors::Rock, RockPaperScissors::rig(&RockPaperScissors::Rock, &GameOutcome::Draw));
+        assert_eq!(RockPaperScissors::Rock, RockPaperScissors::rig(&RockPaperScissors::Paper, &GameOutcome::Loss));
+        assert_eq!(RockPaperScissors::Rock, RockPaperScissors::rig(&RockPaperScissors::Scissors, &GameOutcome::Win));
     }
 }
