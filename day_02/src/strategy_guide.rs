@@ -3,21 +3,27 @@ use regex::Regex;
 
 use crate::rockpaperscissors::{RockPaperScissors, GameOutcome};
 
+pub trait StrategyGuide {
+    fn selection_pair(line: &str) -> (RockPaperScissors, RockPaperScissors);
+}
+
 pub struct WrongStrategyGuide {}
 
 lazy_static! {
     static ref PAIR: Regex = Regex::new(r"(?P<first>[ABC])\s(?P<second>[XYZ])").unwrap();
 }
 
-impl WrongStrategyGuide {
-    pub fn selection_pair(line: &str) -> (RockPaperScissors, RockPaperScissors) {
+impl StrategyGuide for WrongStrategyGuide {
+    fn selection_pair(line: &str) -> (RockPaperScissors, RockPaperScissors) {
         let capture = PAIR.captures(line).unwrap();
         let first = WrongStrategyGuide::decode(&capture["first"]);
         let second = WrongStrategyGuide::decode(&capture["second"]);
         // reverse order because 'we' are the second column
         (second, first)
     }
+}
 
+impl WrongStrategyGuide {
     fn decode(value: &str) -> RockPaperScissors {
         match value {
             "A" | "X" => RockPaperScissors::Rock,
@@ -30,8 +36,8 @@ impl WrongStrategyGuide {
 
 pub struct CorrectStrategyGuide {}
 
-impl CorrectStrategyGuide {
-    pub fn selection_pair(line: &str) -> (RockPaperScissors, RockPaperScissors) {
+impl StrategyGuide for CorrectStrategyGuide {
+    fn selection_pair(line: &str) -> (RockPaperScissors, RockPaperScissors) {
         let capture = PAIR.captures(line).unwrap();
         let first = CorrectStrategyGuide::decode_selection(&capture["first"]);
         let outcome = CorrectStrategyGuide::decode_outcome(&capture["second"]);
@@ -41,7 +47,9 @@ impl CorrectStrategyGuide {
         // reverse order because 'they' are the first column
         (second, first)
     }
+}
 
+impl CorrectStrategyGuide {
     fn decode_selection(value: &str) -> RockPaperScissors {
         match value {
             "A" => RockPaperScissors::Rock,

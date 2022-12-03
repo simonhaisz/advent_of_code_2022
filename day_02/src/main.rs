@@ -1,6 +1,6 @@
 use std::{fs::File, io::{BufReader, BufRead, Lines}};
 
-use strategy_guide::{WrongStrategyGuide, CorrectStrategyGuide};
+use strategy_guide::{StrategyGuide, WrongStrategyGuide, CorrectStrategyGuide};
 use tournament::Tournament;
 
 mod rockpaperscissors;
