@@ -6,7 +6,7 @@ pub struct Tournament {
 }
 
 impl Tournament {
-    pub fn new() -> Tournament {
+    pub fn new() -> Self {
         Tournament { score: 0 }
     }
 

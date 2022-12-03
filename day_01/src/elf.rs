@@ -4,7 +4,7 @@ pub struct Elf {
 }
 
 impl Elf {
-	pub fn new() -> Elf {
+	pub fn new() -> Self {
 		Elf {
 			snacks: vec![],
 		}

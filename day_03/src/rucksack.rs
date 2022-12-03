@@ -5,7 +5,7 @@ pub struct Rucksack {
 }
 
 impl Rucksack {
-    pub fn from(items: &str) -> Rucksack {
+    pub fn from(items: &str) -> Self {
         // each rucksack must be equally splitable across two compartments
         assert!(items.len() % 2 == 0);
         let midpoint = items.len() / 2;
@@ -42,7 +42,7 @@ pub struct ElfGroup {
 }
 
 impl ElfGroup {
-    pub fn new() -> ElfGroup {
+    pub fn new() -> Self {
         ElfGroup { rucksacks: vec![] }
     }
 
