@@ -17,14 +17,11 @@ fn main() -> std::io::Result<()> {
 
 #[allow(dead_code)]
 fn run_part_1(lines: Lines<BufReader<File>>) {
-    let mut total_priority = 0;
-
-    for line in lines {
-        let line = line.unwrap();
-        let rucksack = Rucksack::from(&line);
-
-        total_priority += rucksack.common_priority();
-    }
+    let total_priority = lines
+        .map(|l| l.unwrap())
+        .map(|l| Rucksack::from(&l))
+        .map(|r| r.common_priority())
+        .sum::<u32>();
 
     println!("The sum of the common priorities in all rucksacks is {}", total_priority);
 }
