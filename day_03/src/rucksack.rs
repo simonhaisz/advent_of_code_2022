@@ -1,12 +1,11 @@
 use std::collections::HashSet;
 
-pub struct Rucksack<'a> {
-    contents: Vec<&'a str>,
+pub struct Rucksack {
     common: HashSet<char>,
 }
 
-impl <'a> Rucksack<'a> {
-    pub fn from(items: &'a str) -> Rucksack {
+impl Rucksack {
+    pub fn from(items: &str) -> Rucksack {
         // each rucksack must be equally splitable across two compartments
         assert!(items.len() % 2 == 0);
         let midpoint = items.len() / 2;
@@ -14,10 +13,10 @@ impl <'a> Rucksack<'a> {
             &items[0..midpoint],
             &items[midpoint..],
         ];
-        let common = find_common_characters(contents[0], contents[1]);
+        let common = find_common_characters_pair(contents[0], contents[1]);
         // there should only be one matching item between compartments
         assert_eq!(1, common.len());
-        Rucksack { contents, common }
+        Rucksack { common }
     }
 
     pub fn common_priority(&self) -> u32 {
@@ -25,13 +24,66 @@ impl <'a> Rucksack<'a> {
     }
 }
 
-fn find_common_characters(left: &str, right: &str) -> HashSet<char> {
+fn find_common_characters_pair(left: &str, right: &str) -> HashSet<char> {
     let mut common_characters = HashSet::new();
     for left_c in left.chars() {
         for right_c in right.chars() {
             if left_c == right_c {
                 common_characters.insert(left_c);
             }
+        }
+    }
+    common_characters
+}
+
+pub struct ElfGroup {
+    rucksacks: Vec<String>,
+}
+
+impl ElfGroup {
+    pub fn new() -> ElfGroup {
+        ElfGroup { rucksacks: vec![] }
+    }
+
+    pub fn add(&mut self, rucksack: String) {
+        self.rucksacks.push(rucksack);
+    }
+
+    pub fn len(&self) -> usize {
+        self.rucksacks.len()
+    }
+
+    pub fn priority(&self) -> u32 {
+        let common = find_common_characters_set(&self.rucksacks);
+        assert_eq!(1, common.len());
+        priority(*common.iter().next().unwrap())
+    }
+
+    pub fn reset(&mut self) {
+        self.rucksacks.clear();
+    }
+}
+
+fn find_common_characters_set(strings: &Vec<String>) -> HashSet<char> {
+    assert!(strings.len() > 1);
+    let mut common_characters = HashSet::new();
+    let first = &strings[0];
+    let others = &strings[1..];
+    for first_c in first.chars() {
+        let mut match_found = false;
+        for other in others.iter() {
+            match_found = false;
+            for other_c in other.chars() {
+                if first_c == other_c {
+                    match_found = true;
+                }
+            }
+            if !match_found {
+                break;
+            }
+        }
+        if match_found {
+            common_characters.insert(first_c);
         }
     }
     common_characters
@@ -55,15 +107,12 @@ mod tests {
     #[test]
     fn rucksack() {
         let rucksack = Rucksack::from("vJrwpWtwJgWrhcsFMMfFFhFp");
-        assert_eq!(vec!["vJrwpWtwJgWr", "hcsFMMfFFhFp"], rucksack.contents);
         assert_eq!(vec!['p'], rucksack.common.into_iter().collect::<Vec<char>>());
 
         let rucksack = Rucksack::from("jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL");
-        assert_eq!(vec!["jqHRNqRjqzjGDLGL", "rsFMfFZSrLrFZsSL"], rucksack.contents);
         assert_eq!(vec!['L'], rucksack.common.into_iter().collect::<Vec<char>>());
 
         let rucksack = Rucksack::from("PmmdzqPrVvPwwTWBwg");
-        assert_eq!(vec!["PmmdzqPrV", "vPwwTWBwg"], rucksack.contents);
         assert_eq!(vec!['P'], rucksack.common.into_iter().collect::<Vec<char>>());
     }
 
@@ -75,5 +124,28 @@ mod tests {
         assert_eq!(22, super::priority('v'));
         assert_eq!(20, super::priority('t'));
         assert_eq!(19, super::priority('s'));
+    }
+
+    #[test]
+    fn rucksack_sets() {
+        let rucksacks = vec![
+            "vJrwpWtwJgWrhcsFMMfFFhFp".to_owned(),
+            "jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL".to_owned(),
+            "PmmdzqPrVvPwwTWBwg".to_owned(),
+        ];
+
+        let common_set = find_common_characters_set(&rucksacks);
+        assert_eq!(1, common_set.len());
+        assert_eq!('r', *common_set.iter().next().unwrap());
+
+        let rucksacks = vec![
+            "wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn".to_owned(),
+            "ttgJtRGJQctTZtZT".to_owned(),
+            "CrZsJsPPZsGzwwsLwLmpwMDw".to_owned(),
+        ];
+
+        let common_set = find_common_characters_set(&rucksacks);
+        assert_eq!(1, common_set.len());
+        assert_eq!('Z', *common_set.iter().next().unwrap());
     }
 }
