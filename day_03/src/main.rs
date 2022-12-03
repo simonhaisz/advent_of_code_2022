@@ -18,7 +18,7 @@ fn main() -> std::io::Result<()> {
 #[allow(dead_code)]
 fn run_part_1(lines: Lines<BufReader<File>>) {
     let total_priority = lines
-        .map(|l| l.unwrap())
+        .map(Result::unwrap)
         .map(|l| Rucksack::from(&l))
         .map(|r| r.common_priority())
         .sum::<u32>();

@@ -1,4 +1,4 @@
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum RockPaperScissors {
     Rock,
     Paper,
@@ -55,7 +55,7 @@ impl RockPaperScissors {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum GameOutcome {
     Loss,
     Draw,

@@ -34,16 +34,15 @@ impl Expedition {
 	}
 
 	pub fn find_top_snack_sources(&self, top_elf_count: usize) -> u64 {
-		if top_elf_count > self.elves.len() {
-			panic!("{} is too many top snack sources! There are only {} elves in the expedition", top_elf_count, self.elves.len());
-		}
-		let mut sorted_elves = self.elves.to_vec();
+		assert!(top_elf_count <= self.elves.len(), "{} is too many top snack sources! There are only {} elves in the expedition", top_elf_count, self.elves.len());
+
+		let mut sorted_elves = self.elves.clone();
 		sorted_elves.sort_by(|a, b| b.calories().partial_cmp(&a.calories()).unwrap());
 
 		let top_elves = &sorted_elves[0..top_elf_count];
 
 		top_elves.iter()
-			.map(|e| e.calories())
+			.map(Elf::calories)
 			.sum()
 	}
 }

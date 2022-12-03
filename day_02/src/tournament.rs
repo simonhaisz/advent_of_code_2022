@@ -3,8 +3,8 @@ use crate::rockpaperscissors::RockPaperScissors;
 pub struct Tournament {}
 
 impl Tournament {
-    pub fn score_game(a: RockPaperScissors, b: RockPaperScissors) -> u32 {
-        let outcome = RockPaperScissors::play(&a, &b);
+    pub fn score_game(a: &RockPaperScissors, b: &RockPaperScissors) -> u32 {
+        let outcome = RockPaperScissors::play(a, b);
         a.score() + outcome.score()
     }
 }
@@ -18,9 +18,9 @@ mod tests {
     fn small() {
 
         let mut total = 0;
-        total += Tournament::score_game(Paper, Rock);
-        total += Tournament::score_game(Rock, Paper);
-        total += Tournament::score_game(Scissors, Scissors);
+        total += Tournament::score_game(&Paper, &Rock);
+        total += Tournament::score_game(&Rock, &Paper);
+        total += Tournament::score_game(&Scissors, &Scissors);
         assert_eq!(15, total);
     }
 }

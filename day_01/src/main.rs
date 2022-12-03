@@ -17,9 +17,7 @@ fn main() -> std::io::Result<()> {
     for line in lines {
         let line = line.unwrap();
         if line.is_empty() {
-            if current_elf.is_none() {
-                panic!("Found an empty input line with no elf to add");
-            }
+            assert!(current_elf.is_some(), "Found an empty input line with no elf to add");
             expedition.add_elf(current_elf.take().unwrap());
         } else {
             if current_elf.is_none() {

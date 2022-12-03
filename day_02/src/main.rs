@@ -20,8 +20,9 @@ fn main() -> std::io::Result<()> {
 #[allow(dead_code)]
 fn run_part_1(lines: Lines<BufReader<File>>) {
     let total_score = lines
-        .map(|l| WrongStrategyGuide::selection_pair(&l.unwrap()))
-        .map(|(a, b)| Tournament::score_game(a, b))
+        .map(Result::unwrap)
+        .map(|l| WrongStrategyGuide::selection_pair(&l))
+        .map(|(a, b)| Tournament::score_game(&a, &b))
         .sum::<u32>();
 
     println!("Following the wrong strategy guide should give me a score of {}", total_score);
@@ -29,8 +30,9 @@ fn run_part_1(lines: Lines<BufReader<File>>) {
 
 fn run_part_2(lines: Lines<BufReader<File>>) {
     let total_score = lines
-        .map(|l| CorrectStrategyGuide::selection_pair(&l.unwrap()))
-        .map(|(a, b)| Tournament::score_game(a, b))
+        .map(Result::unwrap)
+        .map(|l| CorrectStrategyGuide::selection_pair(&l))
+        .map(|(a, b)| Tournament::score_game(&a, &b))
         .sum::<u32>();
 
     println!("Following the correct strategy guide should give me a score of {}", total_score);
