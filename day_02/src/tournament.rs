@@ -1,44 +1,26 @@
 use crate::rockpaperscissors::RockPaperScissors;
 
-#[derive(Default)]
-pub struct Tournament {
-    score: u32,
-}
+pub struct Tournament {}
 
 impl Tournament {
-    pub fn new() -> Self {
-        Tournament { score: 0 }
-    }
-
-    pub fn score(&self) -> u32 {
-        self.score
-    }
-
-    pub fn game(&mut self, a: RockPaperScissors, b: RockPaperScissors) {
+    pub fn score_game(a: RockPaperScissors, b: RockPaperScissors) -> u32 {
         let outcome = RockPaperScissors::play(&a, &b);
-
-        self.score += a.score() + outcome.score();
+        a.score() + outcome.score()
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn default() {
-        let empty = Tournament::new();
-
-        assert_eq!(0, empty.score());
-    }
+    use crate::rockpaperscissors::{RockPaperScissors::Rock, RockPaperScissors::Paper, RockPaperScissors::Scissors};
 
     #[test]
     fn small() {
-        let mut small = Tournament::new();
-        small.game(RockPaperScissors::Paper, RockPaperScissors::Rock);
-        small.game(RockPaperScissors::Rock, RockPaperScissors::Paper);
-        small.game(RockPaperScissors::Scissors, RockPaperScissors::Scissors);
 
-        assert_eq!(15, small.score());
+        let mut total = 0;
+        total += Tournament::score_game(Paper, Rock);
+        total += Tournament::score_game(Rock, Paper);
+        total += Tournament::score_game(Scissors, Scissors);
+        assert_eq!(15, total);
     }
 }

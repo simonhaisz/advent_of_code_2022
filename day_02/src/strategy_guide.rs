@@ -1,17 +1,21 @@
 use lazy_static::lazy_static;
 use regex::Regex;
 
-use crate::rockpaperscissors::{RockPaperScissors, GameOutcome};
+use crate::rockpaperscissors::{
+    RockPaperScissors, RockPaperScissors::Rock, RockPaperScissors::Paper, RockPaperScissors::Scissors,
+    GameOutcome, GameOutcome::Loss, GameOutcome::Draw, GameOutcome::Win,
+};
+
+
+lazy_static! {
+    static ref PAIR: Regex = Regex::new(r"(?P<first>[ABC])\s(?P<second>[XYZ])").unwrap();
+}
 
 pub trait StrategyGuide {
     fn selection_pair(line: &str) -> (RockPaperScissors, RockPaperScissors);
 }
 
 pub struct WrongStrategyGuide {}
-
-lazy_static! {
-    static ref PAIR: Regex = Regex::new(r"(?P<first>[ABC])\s(?P<second>[XYZ])").unwrap();
-}
 
 impl StrategyGuide for WrongStrategyGuide {
     fn selection_pair(line: &str) -> (RockPaperScissors, RockPaperScissors) {
@@ -26,9 +30,9 @@ impl StrategyGuide for WrongStrategyGuide {
 impl WrongStrategyGuide {
     fn decode(value: &str) -> RockPaperScissors {
         match value {
-            "A" | "X" => RockPaperScissors::Rock,
-            "B" | "Y" => RockPaperScissors::Paper,
-            "C" | "Z" => RockPaperScissors::Scissors,
+            "A" | "X" => Rock,
+            "B" | "Y" => Paper,
+            "C" | "Z" => Scissors,
             _ => panic!("Unexpected value '{}' - must be in (A, B, C, X, Y, Z)", value),
         }
     }
@@ -52,18 +56,18 @@ impl StrategyGuide for CorrectStrategyGuide {
 impl CorrectStrategyGuide {
     fn decode_selection(value: &str) -> RockPaperScissors {
         match value {
-            "A" => RockPaperScissors::Rock,
-            "B" => RockPaperScissors::Paper,
-            "C" => RockPaperScissors::Scissors,
+            "A" => Rock,
+            "B" => Paper,
+            "C" => Scissors,
             _ => panic!("Unexpected value '{}' - must be in (A, B, C)", value),
         }
     }
 
     fn decode_outcome(value: &str) -> GameOutcome {
         match value {
-            "X" => GameOutcome::Loss,
-            "Y" => GameOutcome::Draw,
-            "Z" => GameOutcome::Win,
+            "X" => Loss,
+            "Y" => Draw,
+            "Z" => Win,
             _ => panic!("Unexpected value '{}' - must be in (X, Y, Z)", value),
         }
     }
@@ -75,15 +79,15 @@ mod tests {
 
     #[test]
     fn wrong() {
-        assert_eq!((RockPaperScissors::Paper, RockPaperScissors::Rock), WrongStrategyGuide::selection_pair("A Y"));
-        assert_eq!((RockPaperScissors::Rock, RockPaperScissors::Paper), WrongStrategyGuide::selection_pair("B X"));
-        assert_eq!((RockPaperScissors::Scissors, RockPaperScissors::Scissors), WrongStrategyGuide::selection_pair("C Z"));
+        assert_eq!((Paper, Rock), WrongStrategyGuide::selection_pair("A Y"));
+        assert_eq!((Rock, Paper), WrongStrategyGuide::selection_pair("B X"));
+        assert_eq!((Scissors, Scissors), WrongStrategyGuide::selection_pair("C Z"));
     }
 
     #[test]
     fn correct() {
-        assert_eq!((RockPaperScissors::Rock, RockPaperScissors::Rock), CorrectStrategyGuide::selection_pair("A Y"));
-        assert_eq!((RockPaperScissors::Rock, RockPaperScissors::Paper), CorrectStrategyGuide::selection_pair("B X"));
-        assert_eq!((RockPaperScissors::Rock, RockPaperScissors::Scissors), CorrectStrategyGuide::selection_pair("C Z"));
+        assert_eq!((Rock, Rock), CorrectStrategyGuide::selection_pair("A Y"));
+        assert_eq!((Rock, Paper), CorrectStrategyGuide::selection_pair("B X"));
+        assert_eq!((Rock, Scissors), CorrectStrategyGuide::selection_pair("C Z"));
     }
 }
