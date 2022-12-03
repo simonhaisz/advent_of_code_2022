@@ -64,7 +64,7 @@ impl ElfGroup {
     }
 }
 
-fn find_common_characters_set(strings: &Vec<String>) -> HashSet<char> {
+fn find_common_characters_set(strings: &[String]) -> HashSet<char> {
     assert!(strings.len() > 1);
     let mut common_characters = HashSet::new();
     let first = &strings[0];
