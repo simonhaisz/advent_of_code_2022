@@ -1,4 +1,4 @@
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct Elf {
 	snacks: Vec<u64>,
 }

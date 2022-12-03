@@ -1,5 +1,6 @@
 use crate::elf::Elf;
 
+#[derive(Default)]
 pub struct Expedition {
 	elves: Vec<Elf>,
 }

@@ -36,6 +36,7 @@ fn find_common_characters_pair(left: &str, right: &str) -> HashSet<char> {
     common_characters
 }
 
+#[derive(Default)]
 pub struct ElfGroup {
     rucksacks: Vec<String>,
 }

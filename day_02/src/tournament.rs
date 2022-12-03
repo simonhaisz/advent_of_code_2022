@@ -1,5 +1,6 @@
 use crate::rockpaperscissors::RockPaperScissors;
 
+#[derive(Default)]
 pub struct Tournament {
     score: u32,
 }
