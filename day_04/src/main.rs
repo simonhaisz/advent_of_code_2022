@@ -3,19 +3,19 @@ mod parser;
 
 use std::{fs::File, io::{BufReader, BufRead}};
 
-use assignment::assignments_redundant;
+use assignment::{assignments_redundant, assignments_have_waste};
 use parser::parse_assignments;
 
 fn main() -> std::io::Result<()> {
     let file = File::open("./day_04/input.txt")?;
-    let mut reader = BufReader::new(file);
 
-    run_part_1(&mut reader);
+    run_part_2(&file);
+
     Ok(())
 }
 
-fn run_part_1(reader: &mut BufReader<File>) {
-    let count = reader.lines()
+fn run_part_1(file: &File) {
+    let count = BufReader::new(file).lines()
         .map(Result::unwrap)
         .map(|v| parse_assignments(&v))
         .map(|(a, b)| assignments_redundant(a, b))
@@ -23,4 +23,15 @@ fn run_part_1(reader: &mut BufReader<File>) {
         .count();
     
     println!("There are {} assignment pairs where work is completly duplicated", count);
+}
+
+fn run_part_2(file: &File) {
+    let count = BufReader::new(file).lines()
+        .map(Result::unwrap)
+        .map(|v| parse_assignments(&v))
+        .map(|(a, b)| assignments_have_waste(a, b))
+        .filter(|b| *b)
+        .count();
+    
+        println!("There are {} assignment pairs where some work is wasted", count);
 }
