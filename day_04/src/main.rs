@@ -14,6 +14,7 @@ fn main() -> std::io::Result<()> {
     Ok(())
 }
 
+#[allow(dead_code)]
 fn run_part_1(file: &File) {
     let count = BufReader::new(file).lines()
         .map(Result::unwrap)
