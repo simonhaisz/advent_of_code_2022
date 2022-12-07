@@ -6,7 +6,7 @@ mod data_stream;
 
 fn main() -> std::io::Result<()> {
     let data = fs::read_to_string("./day_06/input.txt")?;
-    let stream = DataStream::new(&data.trim());
+    let stream = DataStream::new(data.trim());
 
     println!("{}", run_part_2(&stream));
 
