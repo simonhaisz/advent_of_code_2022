@@ -11,7 +11,7 @@ use util::Timer;
 use crate::crane::CrateMover9000;
 
 fn main() -> std::io::Result<()> {
-    let _timer = Timer::new();
+    let _timer: Timer;
 
     let file = File::open("./day_05/input.txt")?;
 

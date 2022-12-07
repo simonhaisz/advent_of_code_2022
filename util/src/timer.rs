@@ -10,6 +10,12 @@ impl Timer {
     }
 }
 
+impl Default for Timer {
+	fn default() -> Self {
+		Self::new()
+	}
+}
+
 impl Drop for Timer {
     fn drop(&mut self) {
         println!("Completed in {} seconds", self.start.elapsed().as_secs_f64());
