@@ -11,7 +11,7 @@ use util::Timer;
 
 
 fn main() -> std::io::Result<()> {
-    let _timer: Timer;
+    let _timer = Timer::new();
     
     let file = File::open("./day_02/input.txt")?;
     let lines = BufReader::new(file).lines();
