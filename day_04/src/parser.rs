@@ -6,7 +6,8 @@ lazy_static! {
     static ref PAIR: Regex = Regex::new(r"(?P<first_start>\d+)-(?P<first_end>\d+),(?P<second_start>\d+)-(?P<second_end>\d+)").unwrap();
 }
 pub fn parse_assignments(line: &str) -> (RangeInclusive<u8>, RangeInclusive<u8>) {
-    let capture = PAIR.captures(line).expect(&format!("Line '{}' should match the regex", line));
+    let capture = PAIR.captures(line)
+        .unwrap_or_else(|| panic!("Line '{}' should match the regex", line));
     let parse_id = |v: &str| v.parse::<u8>().unwrap();
 
     let ids = vec!["first_start", "first_end", "second_start", "second_end"]

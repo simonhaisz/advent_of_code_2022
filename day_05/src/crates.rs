@@ -22,14 +22,11 @@ impl Crates {
                 if stacks.len() == column {
                     stacks.push(vec![]);
                 }
-                match capture.name("crate") {
-                    Some(m) => {
-                        let name = m.as_str().chars().nth(0).unwrap();
-                        // stacks start at the bottom but the lines start at the top
-                        // always insert new crates to the bottom of the stack
-                        stacks[column].insert(0, name);
-                    },
-                    None => {},
+                if let Some(m) = capture.name("crate") {
+                    let name = m.as_str().chars().next().unwrap();
+                    // stacks start at the bottom but the lines start at the top
+                    // always insert new crates to the bottom of the stack
+                    stacks[column].insert(0, name);
                 }
             }
         }
