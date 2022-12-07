@@ -6,10 +6,13 @@ use crane::{Move, Crane, CrateMover9001};
 use crates::Crates;
 use lazy_static::lazy_static;
 use regex::Regex;
+use util::Timer;
 
 use crate::crane::CrateMover9000;
 
 fn main() -> std::io::Result<()> {
+    let _timer = Timer::new();
+
     let file = File::open("./day_05/input.txt")?;
 
     let mut state = InputReaderState::CrateStacks;

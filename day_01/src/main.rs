@@ -6,8 +6,11 @@ use std::io::{BufReader, BufRead};
 
 use elf::Elf;
 use expedition::Expedition;
+use util::Timer;
 
 fn main() -> std::io::Result<()> {
+    let _timer = Timer::new();
+    
     let file = File::open("./day_01/input.txt")?;
     let lines = BufReader::new(file).lines();
 

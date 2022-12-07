@@ -6,10 +6,13 @@ use std::{fs::File, io::{BufReader, BufRead, Lines}};
 
 use strategy_guide::{StrategyGuide, WrongStrategyGuide, CorrectStrategyGuide};
 use tournament::Tournament;
+use util::Timer;
 
 
 
 fn main() -> std::io::Result<()> {
+    let _timer = Timer::new();
+    
     let file = File::open("./day_02/input.txt")?;
     let lines = BufReader::new(file).lines();
 

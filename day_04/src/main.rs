@@ -5,8 +5,11 @@ use std::{fs::File, io::{BufReader, BufRead}};
 
 use assignment::{assignments_redundant, assignments_have_waste};
 use parser::parse_assignments;
+use util::Timer;
 
 fn main() -> std::io::Result<()> {
+    let _timer = Timer::new();
+    
     let file = File::open("./day_04/input.txt")?;
 
     run_part_2(&file);
