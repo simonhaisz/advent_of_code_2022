@@ -9,45 +9,31 @@ pub struct Crates {
 }
 
 lazy_static! {
-    static ref HORIZONTAL_CRATES: Regex = Regex::new(r"(\[[A-Z]\]|\s{3})\s?").unwrap();
+    static ref HORIZONTAL_CRATES: Regex = Regex::new(r"(\[(?P<crate>[A-Z])\]|(\s{3}))\s?").unwrap();
 }
 
 impl Crates {
-    pub fn new() -> Self {
-        Crates { stacks: vec![] }
-    }
-
     pub fn from(lines: &[String]) -> Self {
-        let mut stacks: Option<Vec<Vec<char>>> = None;
+        let mut stacks = vec![];
         for line in lines {
-            let captures = HORIZONTAL_CRATES.captures(line).expect(&format!("Line '{}' should match the regex", line));
+            let captures = HORIZONTAL_CRATES.captures_iter(line);
 
-            if stacks.is_none() {
-                stacks.replace(Vec::with_capacity(captures.len()));
-            }
-            for (column, c) in captures.iter().enumerate() {
-                match c {
+            for (column, capture) in captures.enumerate() {
+                if stacks.len() == column {
+                    stacks.push(vec![]);
+                }
+                match capture.name("crate") {
                     Some(m) => {
-                        let text = m.as_str();
-                        let mut chars = text.chars();
-                        let one = chars.next().unwrap();
-                        let two = chars.next().unwrap();
-                        let three = chars.next().unwrap();
-                        if two.is_alphabetic() {
-                            stacks.as_mut().unwrap()[column].push(two);
-                        }
+                        let name = m.as_str().chars().nth(0).unwrap();
+                        // stacks start at the bottom but the lines start at the top
+                        // always insert new crates to the bottom of the stack
+                        stacks[column].insert(0, name);
                     },
-                    None => panic!("No match from line '{}'", line)
+                    None => {},
                 }
             }
         }
 
-        let stacks = stacks.unwrap();
-
-        Crates { stacks }
-    }
-
-    pub fn from_stacks(stacks: Vec<Vec<Crate>>) -> Self {
         Crates { stacks }
     }
 
@@ -67,6 +53,12 @@ impl Crates {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    impl Crates {
+        pub fn from_stacks(stacks: Vec<Vec<Crate>>) -> Self {
+            Crates { stacks }
+        }
+    }
 
     #[test]
     fn top_crates() {
