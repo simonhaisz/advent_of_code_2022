@@ -2,29 +2,16 @@ mod crates;
 mod crane;
 
 use std::{fs::File, io::{BufReader, BufRead}};
-use crane::{Move, Crane};
+use crane::{Move, Crane, CrateMover9001};
 use crates::Crates;
 use lazy_static::lazy_static;
 use regex::Regex;
 
+use crate::crane::CrateMover9000;
+
 fn main() -> std::io::Result<()> {
     let file = File::open("./day_05/input.txt")?;
 
-    run_part_1(&file);
-
-    Ok(())
-}
-
-enum InputReaderState {
-    CrateStacks,
-    Moves,
-}
-
-lazy_static! {
-    static ref CRATE_STACK_NUMBER_LINE: Regex = Regex::new(r"^(\s+(\d+)\s+)+$").unwrap();
-}
-
-fn run_part_1(file: &File) {
     let mut state = InputReaderState::CrateStacks;
 
     let mut crate_stack_lines = vec![];
@@ -57,9 +44,31 @@ fn run_part_1(file: &File) {
         .map(|l| Move::from(l))
         .collect::<Vec<_>>();
     
-    for m in moves {
-        Crane::move_crates(&mut crates, m);
-    }
+    run_part_2(&mut crates, &moves);
 
     println!("After all of the moves the top crates are '{}'", crates.top_crates());
+
+    Ok(())
+}
+
+enum InputReaderState {
+    CrateStacks,
+    Moves,
+}
+
+lazy_static! {
+    static ref CRATE_STACK_NUMBER_LINE: Regex = Regex::new(r"^(\s+(\d+)\s+)+$").unwrap();
+}
+
+#[allow(dead_code)]
+fn run_part_1(crates: &mut Crates, moves: &[Move]) {
+    for m in moves {
+        CrateMover9000::move_crates(crates, m);
+    }
+}
+
+fn run_part_2(crates: &mut Crates, moves: &[Move]) {
+    for m in moves {
+        CrateMover9001::move_crates(crates, m);
+    }
 }

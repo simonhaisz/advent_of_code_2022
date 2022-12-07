@@ -25,13 +25,25 @@ impl Move {
     }
 }
 
-pub struct Crane {}
+pub trait Crane {
+    fn move_crates(crates: &mut Crates, m: &Move);
+}
 
-impl Crane {
-    pub fn move_crates(crates: &mut Crates, m: Move) {
+pub struct CrateMover9000 {}
+
+impl Crane for CrateMover9000 {
+    fn move_crates(crates: &mut Crates, m: &Move) {
         for _ in 0..m.moves {
             crates.move_crate(m.from as usize, m.to as usize);
         }
+    }
+}
+
+pub struct CrateMover9001 {}
+
+impl Crane for CrateMover9001 {
+    fn move_crates(crates: &mut Crates, m: &Move) {
+        crates.move_crates(m.moves as usize, m.from as usize, m.to as usize);
     }
 }
 
@@ -46,19 +58,35 @@ mod tests {
     }
 
     #[test]
-    fn move_crates() {
+    fn crate_mover_9000() {
         let mut crates = Crates::from_stacks(vec![
             vec!['Z', 'N'],
             vec!['M', 'C', 'D'],
             vec!['P'],
         ]);
         
-        Crane::move_crates(&mut crates, Move::new(1, 2, 1));
-        Crane::move_crates(&mut crates, Move::new(3, 1, 3));
-        Crane::move_crates(&mut crates, Move::new(2, 2, 1));
-        Crane::move_crates(&mut crates, Move::new(1, 1, 2));
+        CrateMover9000::move_crates(&mut crates, &Move::new(1, 2, 1));
+        CrateMover9000::move_crates(&mut crates, &Move::new(3, 1, 3));
+        CrateMover9000::move_crates(&mut crates, &Move::new(2, 2, 1));
+        CrateMover9000::move_crates(&mut crates, &Move::new(1, 1, 2));
 
         assert_eq!("CMZ", crates.top_crates());
+    }
+
+    #[test]
+    fn crate_mover_9001() {
+        let mut crates = Crates::from_stacks(vec![
+            vec!['Z', 'N'],
+            vec!['M', 'C', 'D'],
+            vec!['P'],
+        ]);
+        
+        CrateMover9001::move_crates(&mut crates, &Move::new(1, 2, 1));
+        CrateMover9001::move_crates(&mut crates, &Move::new(3, 1, 3));
+        CrateMover9001::move_crates(&mut crates, &Move::new(2, 2, 1));
+        CrateMover9001::move_crates(&mut crates, &Move::new(1, 1, 2));
+
+        assert_eq!("MCD", crates.top_crates());
     }
 
     #[test]

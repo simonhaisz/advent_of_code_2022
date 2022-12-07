@@ -48,6 +48,24 @@ impl Crates {
         let c = self.stacks[from - 1].pop().unwrap();
         self.stacks[to - 1].push(c);
     }
+
+    pub fn move_crates(&mut self, count: usize, from: usize, to: usize) {
+        let crates = self.take_crates(count, from - 1);
+        self.give_crates(crates, to - 1);
+    }
+
+    fn take_crates(&mut self, count: usize, index: usize) -> Vec<char> {
+        let stack = self.stacks.get_mut(index).unwrap();
+        let range_start = stack.len() - count;
+        let range_end = stack.len();
+        stack.splice(range_start..range_end, []).collect::<Vec<char>>()
+    }
+
+    fn give_crates(&mut self, crates: Vec<char>, index: usize) {
+        let stack = self.stacks.get_mut(index).unwrap();
+        stack.extend(crates);
+
+    }
 }
 
 #[cfg(test)]
