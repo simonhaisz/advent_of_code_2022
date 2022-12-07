@@ -8,6 +8,16 @@ fn main() -> std::io::Result<()> {
     let data = fs::read_to_string("./day_06/input.txt")?;
     let stream = DataStream::new(&data.trim());
 
-    println!("{}", stream.find_packet_marker().unwrap());
+    println!("{}", run_part_2(&stream));
+
     Ok(())
+}
+
+#[allow(dead_code)]
+fn run_part_1(stream: &DataStream) -> usize {
+    stream.find_packet_marker().unwrap()
+}
+
+fn run_part_2(stream: &DataStream) -> usize {
+    stream.find_message_marker().unwrap()
 }
