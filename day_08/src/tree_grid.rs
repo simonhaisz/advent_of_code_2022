@@ -7,7 +7,7 @@ pub struct TreeGrid {
 impl TreeGrid {
     pub fn from_grid(text: &str) -> Self {
         let lines = text
-            .split("\n")
+            .split('\n')
             .collect::<Vec<&str>>();
 
         TreeGrid::from_lines(&lines)
@@ -144,7 +144,7 @@ fn search(tree_grid: &TreeGrid, origin: usize, direction: SearchDirection) -> (u
     let mut current = origin;
     while let Some(next) = tree_grid.next(current, &direction) {
         visible_tree_count += 1;
-        let next_size = *tree_grid.trees.get(next).expect(&format!("There should be a tree with index {}", next));
+        let next_size = *tree_grid.trees.get(next).unwrap_or_else(|| panic!("There should be a tree with index {}", next));
         if next_size >= size {
             return (visible_tree_count, false);
         }
