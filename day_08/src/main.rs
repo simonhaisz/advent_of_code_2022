@@ -12,9 +12,20 @@ fn main() -> std::io::Result<()> {
 
     let tree_grid = TreeGrid::from_grid(&data);
 
+    run_part_2(&tree_grid);
+
+    Ok(())
+}
+
+#[allow(dead_code)]
+fn run_part_1(tree_grid: &TreeGrid) {
     let visible_tree_count = tree_grid.visible_trees_count();
 
     println!("There are {} visible trees", visible_tree_count);
+}
 
-    Ok(())
+fn run_part_2(tree_grid: &TreeGrid) {
+    let most_scenic = tree_grid.find_most_scenic_tree();
+
+    println!("The most scenic tree has a score of {}", most_scenic.score());
 }
