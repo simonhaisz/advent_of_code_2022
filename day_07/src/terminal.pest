@@ -1,0 +1,31 @@
+WHITESPACE = _{ " " }
+
+NUMBER = { ASCII_DIGIT+ }
+
+PROMPT = { "$" }
+UP_DIR = { ".." }
+ROOT_DIR = { "/" }
+
+name = { ASCII_ALPHA+ ~ ("." ~ ASCII_ALPHA+)? }
+
+path = { name | UP_DIR | ROOT_DIR }
+change_dir = { PROMPT ~ "cd" ~ path }
+
+list = { PROMPT ~ "ls" }
+
+command = { (change_dir | list )}
+
+file = { NUMBER ~ name }
+
+dir = { "dir" ~ name }
+
+output = { (file | dir) }
+
+line = { command | output }
+
+terminal = {
+	SOI ~
+	line ~ (NEWLINE ~ line)* ~
+	NEWLINE? ~
+	EOI
+}
