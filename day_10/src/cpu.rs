@@ -98,6 +98,38 @@ impl Program {
 			.map(|c| self.signal_strength(*c))
 			.sum()
 	}
+
+	pub fn register_as_cycle(&self, target_cycle: u64) -> i64 {
+		let mut current_value = 0;
+		for (cycle, x) in self.cycle_register.iter() {
+			if *cycle < target_cycle {
+				current_value = *x;
+			} else {
+				break;
+			}
+		}
+
+		current_value
+	}
+
+	pub fn draw_pixels(&mut self) -> String {
+		let mut pixels = String::new();
+		for c in 1..240 {
+			let x = self.register_as_cycle(c);
+			let delta = x - c as i64;
+			if delta.abs() <= 1 {
+				pixels += "#";
+			} else {
+				pixels += ".";
+			}
+			if c % 40 == 0 {
+				pixels += "\n";
+			}
+		}
+
+		pixels
+
+	}
 }
 
 impl Default for Program {

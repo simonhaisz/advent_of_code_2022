@@ -20,5 +20,7 @@ fn main() -> std::io::Result<()> {
     
     println!("{}", program.signal_strength_sum(&vec![20, 60, 100, 140, 180, 220]));
 
+    println!("{}", program.draw_pixels());
+
     Ok(())
 }
