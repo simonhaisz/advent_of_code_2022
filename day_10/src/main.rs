@@ -17,10 +17,17 @@ fn main() -> std::io::Result<()> {
     for op in ops {
         program.run(op);
     }
-    
-    println!("{}", program.signal_strength_sum(&vec![20, 60, 100, 140, 180, 220]));
 
-    println!("{}", program.draw_pixels());
+    run_part_2(&program);
 
     Ok(())
+}
+
+#[allow(dead_code)]
+fn run_part_1(program: &Program) {
+    println!("{}", program.signal_strength_sum(&[20, 60, 100, 140, 180, 220]));
+}
+
+fn run_part_2(program: &Program) {
+    println!("{}", program.draw_pixels());
 }

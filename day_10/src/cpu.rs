@@ -1,10 +1,10 @@
 
-pub struct CPU {
+pub struct Cpu {
 	x: i64,
 	cycles_completed: u64,
 }
 
-impl CPU {
+impl Cpu {
 	pub fn new() -> Self {
 		Self { x: 1, cycles_completed: 0 }
 	}
@@ -23,26 +23,26 @@ impl CPU {
 	}
 }
 
-impl Default for CPU {
+impl Default for Cpu {
     fn default() -> Self {
-        CPU::new()
+        Cpu::new()
     }
 }
 
 pub enum Operation {
-	NOOP,
-	ADDX(i64)
+	Noop,
+	AddX(i64)
 }
 
 impl Operation {
 	pub fn from(line: &str) -> Self {
 		if line == "noop" {
-			Operation::NOOP
+			Operation::Noop
 		} else if line.starts_with("addx") {
 			let mut pair = line.split(' ');
 			pair.next();
 			let n = pair.next().unwrap().parse::<i64>().unwrap();
-			Operation::ADDX(n)
+			Operation::AddX(n)
 		} else {
 			panic!("")
 		}
@@ -50,7 +50,7 @@ impl Operation {
 
 	pub fn series_from(input: &str) -> Vec<Self> {
 		let mut ops = vec![];
-		for line in input.split("\n") {
+		for line in input.split('\n') {
 			if line.is_empty() {
 				continue;
 			}
@@ -62,19 +62,19 @@ impl Operation {
 }
 
 pub struct Program {
-	cpu: CPU,
+	cpu: Cpu,
 	cycle_register: Vec<(u64, i64)>,
 }
 
 impl Program {
 	pub fn new() -> Self {
-		Self { cpu: CPU::new(), cycle_register: vec![] }
+		Self { cpu: Cpu::new(), cycle_register: vec![] }
 	}
 
 	pub fn run(&mut self, op: Operation) {
 		match op {
-			Operation::NOOP => self.cpu.noop(),
-			Operation::ADDX(n) => self.cpu.add(n),
+			Operation::Noop => self.cpu.noop(),
+			Operation::AddX(n) => self.cpu.add(n),
 		}
 		
 		self.cycle_register.push((self.cpu.cycles_completed, self.cpu.x()));
@@ -112,17 +112,18 @@ impl Program {
 		current_value
 	}
 
-	pub fn draw_pixels(&mut self) -> String {
+	pub fn draw_pixels(&self) -> String {
 		let mut pixels = String::new();
-		for c in 1..240 {
+		for c in 1..=240 {
 			let x = self.register_as_cycle(c);
-			let delta = x - c as i64;
+			let column = c as i64 % 40 - 1;
+			let delta = x - column;
 			if delta.abs() <= 1 {
 				pixels += "#";
 			} else {
 				pixels += ".";
 			}
-			if c % 40 == 0 {
+			if c < 240 && c % 40 == 0 {
 				pixels += "\n";
 			}
 		}
@@ -306,6 +307,18 @@ noop
 		assert_eq!(2880, program.signal_strength(180));
 		assert_eq!(3960, program.signal_strength(220));
 
-		assert_eq!(13140, program.signal_strength_sum(&vec![20, 60, 100, 140, 180, 220]));
+		assert_eq!(13140, program.signal_strength_sum(&[20, 60, 100, 140, 180, 220]));
+
+		let screen = program.draw_pixels();
+
+		assert_eq!(
+"##..##..##..##..##..##..##..##..##..##..
+###...###...###...###...###...###...###.
+####....####....####....####....####....
+#####.....#####.....#####.....#####.....
+######......######......######......####
+#######.......#######.......#######.....",
+			screen
+		);
 	}
 }
