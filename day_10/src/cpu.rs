@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 
 pub struct CPU {
 	x: i64,
@@ -19,20 +18,8 @@ impl CPU {
 		self.cycles_completed += 2;
 	}
 
-	pub fn cycles_completed(&self) -> u64 {
-		self.cycles_completed
-	}
-
 	pub fn x(&self) -> i64 {
 		self.x
-	}
-
-	pub fn state(&self) -> (u64, i64) {
-		(self.cycles_completed, self.x)
-	}
-
-	pub fn signal_strength(&self) -> i64 {
-		((self.cycles_completed + 1) as i64) * self.x
 	}
 }
 
@@ -85,9 +72,6 @@ impl Program {
 	}
 
 	pub fn run(&mut self, op: Operation) {
-		let before_x = self.cpu.x();
-		let before_cycles = self.cpu.cycles_completed();
-
 		match op {
 			Operation::NOOP => self.cpu.noop(),
 			Operation::ADDX(n) => self.cpu.add(n),
