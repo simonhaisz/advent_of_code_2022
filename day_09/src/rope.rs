@@ -69,10 +69,6 @@ impl Rope {
 		}
 	}
 
-	pub fn head(&self) -> &Position {
-		self.knots.first().unwrap()
-	}
-
 	pub fn head_mut(&mut self) -> &mut Position {
 		self.knots.first_mut().unwrap()
 	}
@@ -81,14 +77,10 @@ impl Rope {
 		self.knots.last().unwrap()
 	}
 
-	pub fn tail_mut(&mut self) -> &mut Position {
-		self.knots.last_mut().unwrap()
-	}
-
 	pub fn move_head(&mut self, mv: &Move) {
 		for _ in 0..mv.steps {
 			self.mv(&mv.direction);
-			self.tail_trace.insert(self.tail().clone());
+			self.tail_trace.insert(*self.tail());
 		}
 	}
 

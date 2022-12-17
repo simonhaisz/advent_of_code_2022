@@ -26,6 +26,7 @@ fn main() -> std::io::Result<()> {
     Ok(())
 }
 
+#[allow(dead_code)]
 fn part_1_create() -> Rope {
     Rope::new(2)
 }
