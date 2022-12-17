@@ -4,8 +4,7 @@ pub type Position = (i32, i32);
 
 #[derive(Debug)]
 pub struct Rope {
-	head: Position,
-	tail: Position,
+	knots: Vec<Position>,
 	tail_trace: HashSet<Position>,
 }
 
@@ -60,20 +59,36 @@ impl Moveable for Position {
 }
 
 impl Rope {
-	pub fn new() -> Self {
+	pub fn new(knot_count: usize) -> Self {
+		let knots = vec![(0, 0); knot_count];
 		let mut tail_trace = HashSet::new();
 		tail_trace.insert((0, 0));
 		Self {
-			head: (0, 0),
-			tail: (0, 0),
+			knots,
 			tail_trace,
 		}
+	}
+
+	pub fn head(&self) -> &Position {
+		self.knots.first().unwrap()
+	}
+
+	pub fn head_mut(&mut self) -> &mut Position {
+		self.knots.first_mut().unwrap()
+	}
+
+	pub fn tail(&self) -> &Position {
+		self.knots.last().unwrap()
+	}
+
+	pub fn tail_mut(&mut self) -> &mut Position {
+		self.knots.last_mut().unwrap()
 	}
 
 	pub fn move_head(&mut self, mv: &Move) {
 		for _ in 0..mv.steps {
 			self.mv(&mv.direction);
-			self.tail_trace.insert(self.tail.clone());
+			self.tail_trace.insert(self.tail().clone());
 		}
 	}
 
@@ -86,11 +101,11 @@ impl Moveable for Rope {
     type Item = Self;
 
     fn mv(&mut self, direction: &Direction) {
-		self.head.mv(direction);
+		self.head_mut().mv(direction);
 
-		if let Some(delta) = position_delta(&self.head, &self.tail) {
+		if let Some(delta) = position_delta(&self.head(), &self.tail()) {
 			for pull in pull(&delta) {
-				self.tail.mv(&pull);
+				self.tail_mut().mv(&pull);
 			}
 		}
     }
@@ -166,7 +181,7 @@ mod tests {
 
 	#[test]
 	fn sample_moves() {
-		let mut rope = Rope::new();
+		let mut rope = Rope::new(2);
 		rope.move_head(&Move { direction: Direction::Right, steps: 4 });
 		rope.move_head(&Move { direction: Direction::Up, steps: 4 });
 		rope.move_head(&Move { direction: Direction::Left, steps: 3 });

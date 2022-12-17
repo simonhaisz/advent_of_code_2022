@@ -16,7 +16,7 @@ fn main() -> std::io::Result<()> {
             .filter(|l| !l.is_empty())
             .collect::<Vec<&str>>();
     
-    let mut rope = Rope::new();
+    let mut rope = Rope::new(2);
     for line in lines {
         let mv = Move::from(line);
         rope.move_head(&mv);
