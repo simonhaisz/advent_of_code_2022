@@ -103,10 +103,15 @@ impl Moveable for Rope {
     fn mv(&mut self, direction: &Direction) {
 		self.head_mut().mv(direction);
 
-		if let Some(delta) = position_delta(&self.head(), &self.tail()) {
-			for pull in pull(&delta) {
-				self.tail_mut().mv(&pull);
+		for i in 0..self.knots.len() - 1 {
+			let current = self.knots.get(i).unwrap();
+			let next = self.knots.get(i + 1).unwrap();
+			if let Some(delta) = position_delta(current, next) {
+				for pull in pull(&delta) {
+					self.knots.get_mut(i + 1).unwrap().mv(&pull);
+				}
 			}
+
 		}
     }
 }
@@ -180,7 +185,7 @@ mod tests {
 	}
 
 	#[test]
-	fn sample_moves() {
+	fn sample_1_moves() {
 		let mut rope = Rope::new(2);
 		rope.move_head(&Move { direction: Direction::Right, steps: 4 });
 		rope.move_head(&Move { direction: Direction::Up, steps: 4 });
@@ -205,6 +210,59 @@ mod tests {
 		expected_trace.insert((4, 3));
 		expected_trace.insert((2, 4));
 		expected_trace.insert((3, 4));
+
+		assert_eq!(expected_trace, rope.tail_trace);
+	}
+
+	#[test]
+	fn sample_2_moves() {
+		let mut rope = Rope::new(10);
+		rope.move_head(&Move { direction: Direction::Right, steps: 5 });
+		rope.move_head(&Move { direction: Direction::Up, steps: 8 });
+		rope.move_head(&Move { direction: Direction::Left, steps: 8 });
+		rope.move_head(&Move { direction: Direction::Down, steps: 3 });
+		rope.move_head(&Move { direction: Direction::Right, steps: 17 });
+		rope.move_head(&Move { direction: Direction::Down, steps: 10 });
+		rope.move_head(&Move { direction: Direction::Left, steps: 25 });
+		rope.move_head(&Move { direction: Direction::Up, steps: 20 });
+
+		let mut expected_trace = HashSet::new();
+		expected_trace.insert((0, 0));
+		expected_trace.insert((1, 1));
+		expected_trace.insert((2, 2));
+		expected_trace.insert((1, 3));
+		expected_trace.insert((2, 4));
+		expected_trace.insert((3, 5));
+		expected_trace.insert((4, 5));
+		expected_trace.insert((5, 5));
+		expected_trace.insert((6, 4));
+		expected_trace.insert((7, 3));
+		expected_trace.insert((8, 2));
+		expected_trace.insert((9, 1));
+		expected_trace.insert((10, 0));
+		expected_trace.insert((9, -1));
+		expected_trace.insert((8, -2));
+		expected_trace.insert((7, -3));
+		expected_trace.insert((6, -4));
+		expected_trace.insert((5, -5));
+		expected_trace.insert((4, -5));
+		expected_trace.insert((3, -5));
+		expected_trace.insert((2, -5));
+		expected_trace.insert((1, -5));
+		expected_trace.insert((0, -5));
+		expected_trace.insert((-1, -5));
+		expected_trace.insert((-2, -5));
+		expected_trace.insert((-3, -4));
+		expected_trace.insert((-4, -3));
+		expected_trace.insert((-5, -2));
+		expected_trace.insert((-6, -1));
+		expected_trace.insert((-7, 0));
+		expected_trace.insert((-8, 1));
+		expected_trace.insert((-9, 2));
+		expected_trace.insert((-10, 3));
+		expected_trace.insert((-11, 4));
+		expected_trace.insert((-11, 5));
+		expected_trace.insert((-11, 6));
 
 		assert_eq!(expected_trace, rope.tail_trace);
 	}

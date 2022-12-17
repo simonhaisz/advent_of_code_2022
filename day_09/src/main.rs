@@ -16,7 +16,7 @@ fn main() -> std::io::Result<()> {
             .filter(|l| !l.is_empty())
             .collect::<Vec<&str>>();
     
-    let mut rope = Rope::new(2);
+    let mut rope = part_2_create();
     for line in lines {
         let mv = Move::from(line);
         rope.move_head(&mv);
@@ -24,4 +24,12 @@ fn main() -> std::io::Result<()> {
 
     println!("{}", rope.tail_trace_count());
     Ok(())
+}
+
+fn part_1_create() -> Rope {
+    Rope::new(2)
+}
+
+fn part_2_create() -> Rope {
+    Rope::new(10)
 }
