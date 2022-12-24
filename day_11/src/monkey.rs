@@ -15,7 +15,14 @@ impl Param {
         if input == "old" {
             Param::Old
         } else {
-            Param::Value(input.parse().unwrap())
+            Param::Value(input.parse::<i32>().unwrap())
+        }
+    }
+
+    fn value(&self, old: i32) -> i32 {
+        match self {
+            Param::Old => old,
+            Param::Value(v) => *v,
         }
     }
 }
@@ -36,18 +43,63 @@ impl Operator {
 }
 
 struct Operation {
-    a: Param,
-    b: Param,
     op: Operator,
+    param: Param,
+}
+
+impl Operation {
+    fn perform(&self, old: i32) -> i32 {
+        match self.op {
+            Operator::Add => old + self.param.value(old),
+            Operator::Multiply => old * self.param.value(old),
+        }
+    }
 }
 
 pub struct Monkey {
     id: u8,
-    starting_items: Vec<i32>,
+    items: Vec<i32>,
     operation: Operation,
     test_divisor: i32,
     test_pass_throw_target: u8,
     test_fail_throw_target: u8,
+    items_inspected_count: u64,
+}
+
+impl Monkey {
+    pub fn inspect(&mut self) -> Option<(u8, i32)> {
+        if self.items.is_empty() {
+            None
+        } else {
+            self.items_inspected_count += 1;
+            // take item
+            let item = self.items.remove(0);
+            // inspect item
+            let item = self.operation.perform(item);
+            // relief
+            let item = item / 3;
+
+            let target = if item % self.test_divisor == 0 {
+                self.test_pass_throw_target
+            } else {
+                self.test_fail_throw_target
+            };
+
+            Some((target, item))
+        }
+    }
+
+    pub fn catch(&mut self, item: i32) {
+        self.items.push(item);
+    }
+
+    pub fn items(&self) -> &Vec<i32> {
+        &self.items
+    }
+
+    pub fn inspection_count(&self) -> u64 {
+        self.items_inspected_count
+    }
 }
 
 pub fn parse_monkeys(input: &str) -> Vec<Monkey> {
@@ -89,11 +141,10 @@ pub fn parse_monkeys(input: &str) -> Vec<Monkey> {
                         },
                         Rule::operation => {
                             let mut parsed_op_components = parsed_monkey_inner.into_inner();
-                            let a = Param::from(parsed_op_components.next().unwrap().as_str());
                             let op = Operator::from(parsed_op_components.next().unwrap().as_str());
-                            let b = Param::from(parsed_op_components.next().unwrap().as_str());
+                            let param = Param::from(parsed_op_components.next().unwrap().as_str());
 
-                            operation.replace(Operation { a, op, b });
+                            operation.replace(Operation { op, param });
                         },
                         Rule::test => {
                             let divisor = parsed_monkey_inner.into_inner().next().unwrap().as_str()
@@ -126,11 +177,12 @@ pub fn parse_monkeys(input: &str) -> Vec<Monkey> {
 
                 let monkey = Monkey {
                     id: id.unwrap(),
-                    starting_items: starting_items.unwrap(),
+                    items: starting_items.unwrap(),
                     operation: operation.unwrap(),
                     test_divisor: test_divisor.unwrap(),
                     test_pass_throw_target: test_pass_throw_target.unwrap(),
                     test_fail_throw_target: test_fail_throw_target.unwrap(),
+                    items_inspected_count: 0,
                 };
                 monkeys.push(monkey);
             },
@@ -146,7 +198,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn sample_parse() {
+    fn sample() {
         let input = "Monkey 0:
         Starting items: 79, 98
         Operation: new = old * 19
