@@ -57,7 +57,6 @@ impl Operation {
 }
 
 pub struct Monkey {
-    id: u8,
     items: Vec<u64>,
     operation: Operation,
     test_divisor: u64,
@@ -104,10 +103,6 @@ impl Monkey {
 
     pub fn catch(&mut self, item: u64) {
         self.items.push(item);
-    }
-
-    pub fn items(&self) -> &Vec<u64> {
-        &self.items
     }
 
     pub fn inspection_count(&self) -> u64 {
@@ -193,7 +188,6 @@ pub fn parse_monkeys(input: &str) -> Vec<Monkey> {
                 assert!(test_fail_throw_target.is_some());
 
                 let monkey = Monkey {
-                    id: id.unwrap(),
                     items: starting_items.unwrap(),
                     operation: operation.unwrap(),
                     test_divisor: test_divisor.unwrap(),
@@ -213,6 +207,12 @@ pub fn parse_monkeys(input: &str) -> Vec<Monkey> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    impl Monkey {
+        pub fn items(&self) -> &Vec<u64> {
+            &self.items
+        }
+    }
 
     #[test]
     fn sample() {

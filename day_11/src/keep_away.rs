@@ -28,7 +28,7 @@ pub fn keep_away(monkeys: &mut Vec<Monkey>, rounds: u32, relief: &InspectionReli
     }
 }
 
-pub fn monkey_business_level(monkeys: &Vec<Monkey>) -> u64 {
+pub fn monkey_business_level(monkeys: &[Monkey]) -> u64 {
     let mut item_inspections = monkeys.iter()
         .map(|m| m.inspection_count())
         .collect::<Vec<u64>>();

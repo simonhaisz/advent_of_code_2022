@@ -31,7 +31,7 @@ fn run_part_one(monkeys: &mut Vec<Monkey>) {
 }
 
 fn run_part_two(monkeys: &mut Vec<Monkey>) {
-    let common_factors = common_factors(&monkeys);
+    let common_factors = common_factors(monkeys);
     keep_away(monkeys, 10000, &InspectionRelief::None(common_factors));
 
     let monkey_business = monkey_business_level(monkeys);
