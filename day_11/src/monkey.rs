@@ -7,7 +7,7 @@ pub struct MonkeyParser;
 
 enum Param {
     Old,
-    Value(i32),
+    Value(u64),
 }
 
 impl Param {
@@ -15,11 +15,11 @@ impl Param {
         if input == "old" {
             Param::Old
         } else {
-            Param::Value(input.parse::<i32>().unwrap())
+            Param::Value(input.parse::<u64>().unwrap())
         }
     }
 
-    fn value(&self, old: i32) -> i32 {
+    fn value(&self, old: u64) -> u64 {
         match self {
             Param::Old => old,
             Param::Value(v) => *v,
@@ -48,7 +48,7 @@ struct Operation {
 }
 
 impl Operation {
-    fn perform(&self, old: i32) -> i32 {
+    fn perform(&self, old: u64) -> u64 {
         match self.op {
             Operator::Add => old + self.param.value(old),
             Operator::Multiply => old * self.param.value(old),
@@ -58,26 +58,39 @@ impl Operation {
 
 pub struct Monkey {
     id: u8,
-    items: Vec<i32>,
+    items: Vec<u64>,
     operation: Operation,
-    test_divisor: i32,
+    test_divisor: u64,
     test_pass_throw_target: u8,
     test_fail_throw_target: u8,
     items_inspected_count: u64,
 }
 
+pub enum InspectionRelief {
+    None(u64),
+    TwoThirds
+}
+
 impl Monkey {
-    pub fn inspect(&mut self) -> Option<(u8, i32)> {
+    pub fn inspect(&mut self, relief: &InspectionRelief) -> Option<(u8, u64)> {
         if self.items.is_empty() {
             None
         } else {
             self.items_inspected_count += 1;
             // take item
-            let item = self.items.remove(0);
+            let mut item = self.items.remove(0);
             // inspect item
-            let item = self.operation.perform(item);
+            item = self.operation.perform(item);
             // relief
-            let item = item / 3;
+
+            match relief {
+                InspectionRelief::TwoThirds => {
+                    item /= 3;
+                },
+                InspectionRelief::None(factors) => {
+                    item %= *factors;
+                },
+            }
 
             let target = if item % self.test_divisor == 0 {
                 self.test_pass_throw_target
@@ -89,16 +102,20 @@ impl Monkey {
         }
     }
 
-    pub fn catch(&mut self, item: i32) {
+    pub fn catch(&mut self, item: u64) {
         self.items.push(item);
     }
 
-    pub fn items(&self) -> &Vec<i32> {
+    pub fn items(&self) -> &Vec<u64> {
         &self.items
     }
 
     pub fn inspection_count(&self) -> u64 {
         self.items_inspected_count
+    }
+
+    pub fn divisor(&self) -> u64 {
+        self.test_divisor
     }
 }
 
@@ -113,9 +130,9 @@ pub fn parse_monkeys(input: &str) -> Vec<Monkey> {
         match parsed_monkey.as_rule() {
             Rule::monkey => {
                 let mut id: Option<u8> = None;
-                let mut starting_items: Option<Vec<i32>> = None;
+                let mut starting_items: Option<Vec<u64>> = None;
                 let mut operation: Option<Operation> = None;
-                let mut test_divisor: Option<i32> = None;
+                let mut test_divisor: Option<u64> = None;
                 let mut test_pass_throw_target: Option<u8> = None;
                 let mut test_fail_throw_target: Option<u8> = None;
 
@@ -132,7 +149,7 @@ pub fn parse_monkeys(input: &str) -> Vec<Monkey> {
 
                             for parsed_item in parsed_monkey_inner.into_inner() {
                                 let item = parsed_item.as_str()
-                                    .parse::<i32>().unwrap();
+                                    .parse::<u64>().unwrap();
 
                                 items.push(item);
                             }
@@ -148,7 +165,7 @@ pub fn parse_monkeys(input: &str) -> Vec<Monkey> {
                         },
                         Rule::test => {
                             let divisor = parsed_monkey_inner.into_inner().next().unwrap().as_str()
-                                .parse::<i32>().unwrap();
+                                .parse::<u64>().unwrap();
 
                             test_divisor.replace(divisor);
                         },
