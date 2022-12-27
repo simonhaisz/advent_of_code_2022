@@ -35,9 +35,9 @@ impl Ord for PriorityLocation {
     }
 }
 
-pub fn find_easiest_route(map: &Map) -> Vec<Location> {
-    let start = map.start_location();
-    let end = map.end_location();
+pub fn find_easiest_route(map: &Map, start: &Location, end: &Location) -> Option<Vec<Location>> {
+    let start = start.clone();
+    let end = end.clone();
     let mut frontier = BinaryHeap::new();
     frontier.push(PriorityLocation::new(start, 0));
 
@@ -62,15 +62,44 @@ pub fn find_easiest_route(map: &Map) -> Vec<Location> {
         }
     }
 
-    let mut path = vec![];
-    let mut current = end;
-    while current != start {
-        let prev = came_from[&current];
-        path.insert(0, prev);
-        current = prev;
+    if !came_from.contains_key(&end) {
+        None
+    } else {
+        let mut path = vec![];
+        let mut current = end;
+        while current != start {
+            if let Some(prev) = came_from.get(&current) {
+                path.insert(0, *prev);
+                current = *prev;
+            } else {
+                panic!("Cannot trace trail back to ({}, {})", current.0, current.1);
+            }
+        }
+    
+        Some(path)
+    }
+}
+
+pub fn find_easiest_route_from_easiest_start(map: &Map, end: &Location) -> Vec<Location> {
+    let all_starts = map.all_start_locations();
+
+    let mut easiest_route: Option<Vec<Location>> = None;
+
+    for start in all_starts {
+        let route = find_easiest_route(map, &start, end);
+        if let Some(route) = route {
+            let replace = if let Some(easy) = easiest_route.as_ref() {
+                route.len() < easy.len()
+            } else {
+                true
+            };
+            if replace {
+                easiest_route.replace(route);
+            }
+        }
     }
 
-    path
+    easiest_route.unwrap()
 }
 
 pub fn print_route(map: &Map, route: &[Location]) -> String {
@@ -144,11 +173,31 @@ mod tests {
         abdefghi
         ";
         
-        let map = Map::from(input);
+        let (map, start, end) = Map::from(input);
 
-        let easy = find_easiest_route(&map);
+        let easy = find_easiest_route(&map, &start, &end).unwrap();
 
         assert_eq!(31, easy.len());
+
+        let printout = print_route(&map, &easy);
+        println!("{}", printout);
+    }
+
+    #[test]
+    fn any_easy_start() {
+        let input = "
+        Sabqponm
+        abcryxxl
+        accszExk
+        acctuvwj
+        abdefghi
+        ";
+        
+        let (map, _, end) = Map::from(input);
+
+        let easy = find_easiest_route_from_easiest_start(&map, &end);
+
+        assert_eq!(29, easy.len());
 
         let printout = print_route(&map, &easy);
         println!("{}", printout);

@@ -2,8 +2,6 @@ pub struct Map {
     grid: Vec<u8>,
     width: usize,
     height: usize,
-    start: usize,
-    end: usize,
 }
 
 pub type Location = (i64, i64);
@@ -38,7 +36,7 @@ impl GridLocation for Location {
 }
 
 impl Map {
-    pub fn from(input: &str) -> Self {
+    pub fn from(input: &str) -> (Self, Location, Location) {
         let lines = input.split('\n');
         let mut width: Option<usize> = None;
         let mut height = 0;
@@ -85,13 +83,11 @@ impl Map {
         let start = start.unwrap();
         let end = end.unwrap();
 
-        Self {
-            grid,
-            width,
-            height,
-            start,
-            end,
-        }
+        let map = Self { grid, width, height, };
+        let start = map.location(start);
+        let end = map.location(end);
+
+        (map, start, end)
     }
 
     pub fn width(&self) -> usize {
@@ -107,14 +103,6 @@ impl Map {
         let y = index / self.width;
 
         (x as i64, y as i64)
-    }
-
-    pub fn start_location(&self) -> Location {
-        self.location(self.start)
-    }
-
-    pub fn end_location(&self) -> Location {
-        self.location(self.end)
     }
 
     pub fn neighbors(&self, location: &Location) -> Vec<Location> {
@@ -157,6 +145,13 @@ impl Map {
         assert!(location.1 > -1);
         location.0 as usize + location.1 as usize * self.width
     }
+
+    pub fn all_start_locations(&self) -> Vec<Location> {
+        self.grid.iter().enumerate()
+            .filter(|(_, c)| **c as char == 'a')
+            .map(|(i, _)| self.location(i))
+            .collect()
+    }
 }
 
 #[cfg(test)]
@@ -173,11 +168,28 @@ mod tests {
         abdefghi
         ";
 
-        let map = Map::from(input);
+        let (map, start, end) = Map::from(input);
 
         assert_eq!(8, map.width);
         assert_eq!(5, map.height);
-        assert_eq!((0,0), map.start_location());
-        assert_eq!((5,2), map.end_location());
+        assert_eq!((0,0), start);
+        assert_eq!((5,2), end);
+    }
+
+    #[test]
+    fn all_starts() {
+        let input = "
+        Sabqponm
+        abcryxxl
+        accszExk
+        acctuvwj
+        abdefghi
+        ";
+
+        let (map, _, _) = Map::from(input);
+
+        let all_starts = map.all_start_locations();
+
+        assert_eq!(6, all_starts.len());
     }
 }
