@@ -27,7 +27,7 @@ fn run_part_1(map: &Map, start: &Location, end: &Location) {
 
     println!("{}", easy.len());
 
-    println!("{}", print_route(&map, &easy));
+    println!("{}", print_route(map, &easy));
 }
 
 fn run_part_2(map: &Map, end: &Location) {
@@ -35,5 +35,5 @@ fn run_part_2(map: &Map, end: &Location) {
 
     println!("{}", easy.len());
 
-    println!("{}", print_route(&map, &easy));
+    println!("{}", print_route(map, &easy));
 }

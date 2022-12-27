@@ -63,7 +63,7 @@ impl Map {
                         } else {
                             panic!("Found a second 'S' grid reference");
                         }
-                        'a' as u8
+                        b'a'
                     },
                     'E' => {
                         if end.is_none() {
@@ -71,7 +71,7 @@ impl Map {
                         } else {
                             panic!("Fround a second 'E' grid reference");
                         }
-                        'z' as u8
+                        b'z'
                     },
                     c => c as u8,
                 };
@@ -111,12 +111,10 @@ impl Map {
         let down = location.down();
         let left = location.left();
 
-        let current = self.index(&location);
+        let current = self.index(location);
 
         let valid = |l: &Location| {
-            if l.0 < 0 || l.1 < 0 {
-                false
-            } else if l.0 >= self.width as i64 || l.1 >= self.height as i64 {
+            if (l.0 < 0 || l.1 < 0) || (l.0 >= self.width as i64 || l.1 >= self.height as i64) {
                 false
             } else {
                 let next = self.index(l);

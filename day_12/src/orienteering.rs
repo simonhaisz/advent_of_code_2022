@@ -36,8 +36,8 @@ impl Ord for PriorityLocation {
 }
 
 pub fn find_easiest_route(map: &Map, start: &Location, end: &Location) -> Option<Vec<Location>> {
-    let start = start.clone();
-    let end = end.clone();
+    let start = *start;
+    let end = *end;
     let mut frontier = BinaryHeap::new();
     frontier.push(PriorityLocation::new(start, 0));
 
@@ -105,9 +105,7 @@ pub fn find_easiest_route_from_easiest_start(map: &Map, end: &Location) -> Vec<L
 pub fn print_route(map: &Map, route: &[Location]) -> String {
     let mut printout = vec![];
     for _ in 0..map.height() {
-        for _ in 0..map.width() {
-            printout.push('.');
-        }
+        printout.extend(vec!['.'; map.width()]);
         printout.push('\n');
     }
 
