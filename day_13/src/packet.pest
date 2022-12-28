@@ -1,0 +1,7 @@
+integer = {
+    ASCII_DIGIT++
+}
+
+packet = {
+    "[" ~ ((integer | packet) ~ ("," ~ (integer | packet))*)? ~ "]"
+}
