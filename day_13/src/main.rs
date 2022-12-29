@@ -23,7 +23,7 @@ fn run_part_one(data: String) {
     let mut i = 1;
     let mut valid_sum = 0;
 
-    let mut line_iter = data.split("\n");
+    let mut line_iter = data.split('\n');
     loop {
         let first = line_iter.next();
         if first.is_none() {
@@ -44,9 +44,9 @@ fn run_part_one(data: String) {
 }
 
 fn run_part_two(data: String) {
-    let mut packets = data.split("\n")
+    let mut packets = data.split('\n')
         .filter(|l| !l.is_empty())
-        .map(|l| Packet::from(l))
+        .map(Packet::from)
         .collect::<Vec<Packet>>();
 
     let first_divider = Packet::from("[[2]]");

@@ -1,7 +1,7 @@
 use pest::{Parser, iterators::Pair};
 use pest_derive::Parser;
 
-use crate::signal::{validate_packets, validate_list};
+use crate::signal::{validate_list};
 
 #[derive(Parser)]
 #[grammar = "packet.pest"]
@@ -17,7 +17,7 @@ pub struct Packet {
 impl Packet {
     pub fn from(line: &str) -> Self {
         let parsed_packet = PacketParser::parse(Rule::packet, line)
-            .expect(&format!("filed to parse packet '{}'", line))
+            .unwrap_or_else(|_| panic !("filed to parse packet '{}'", line))
             .next()
             .unwrap();
 
@@ -28,14 +28,6 @@ impl Packet {
 
     pub fn data(&self) -> &List {
         &self.data
-    }
-
-    pub fn to_string(&self) -> String {
-        let mut output = String::new();
-
-        PacketData::write_list(&mut output, &self.data);
-
-        output
     }
 }
 
@@ -49,7 +41,7 @@ impl PartialEq for Packet {
 
 impl PartialOrd for Packet {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(match validate_list(&self.data(), &other.data()) {
+        Some(match validate_list(self.data(), other.data()) {
             Some(valid) => if valid { std::cmp::Ordering::Less } else { std::cmp::Ordering::Greater },
             None => std::cmp::Ordering::Equal,
         })
@@ -66,44 +58,6 @@ impl Ord for Packet {
 pub enum PacketData {
     Integer(u8),
     List(List),
-}
-
-impl PacketData {
-    pub fn is_integer(&self) -> bool {
-        match self {
-            PacketData::Integer(_) => true,
-            PacketData::List(_) => false,
-        }
-    }
-
-    pub fn is_list(&self) -> bool {
-        match self {
-            PacketData::Integer(_) => false,
-            PacketData::List(_) => true,
-        }
-    }
-
-    fn write(&self, output: &mut String) {
-        match self {
-            PacketData::Integer(integer) => PacketData::write_integer(output, integer),
-            PacketData::List(list) => PacketData::write_list(output, list),
-        }
-    }
-
-    fn write_integer(output: &mut String, integer: &u8) {
-        output.push_str(&format!("{}", integer))
-    }
-
-    fn write_list(output: &mut String, list: &[PacketData]) {
-        output.push('[');
-        for (i, data) in list.iter().enumerate() {
-            if i > 0 {
-                output.push(',');
-            }
-            data.write(output);
-        }
-        output.push(']');
-    }
 }
 
 fn parse_packet_list(parsed_list: Pair<Rule>) -> List {
@@ -135,6 +89,41 @@ fn parse_packet_integer(parsed_integer: Pair<Rule>) -> u8 {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    impl Packet {
+        pub fn to_string(&self) -> String {
+            let mut output = String::new();
+    
+            PacketData::write_list(&mut output, &self.data);
+    
+            output
+        }
+    }
+
+    impl PacketData {
+
+        fn write(&self, output: &mut String) {
+            match self {
+                PacketData::Integer(integer) => PacketData::write_integer(output, integer),
+                PacketData::List(list) => PacketData::write_list(output, list),
+            }
+        }
+    
+        fn write_integer(output: &mut String, integer: &u8) {
+            output.push_str(&format!("{}", integer))
+        }
+    
+        fn write_list(output: &mut String, list: &[PacketData]) {
+            output.push('[');
+            for (i, data) in list.iter().enumerate() {
+                if i > 0 {
+                    output.push(',');
+                }
+                data.write(output);
+            }
+            output.push(']');
+        }
+    }
 
     fn validate_parsing(line: &str) {
         let packet = Packet::from(line);

@@ -1,3 +1,5 @@
+use std::cmp::Ordering;
+
 use crate::packet::{List, Packet, PacketData::{Integer as IntData, List as ListData}};
 
 pub fn validate_packets(a: &Packet, b: &Packet) -> bool {
@@ -5,12 +7,10 @@ pub fn validate_packets(a: &Packet, b: &Packet) -> bool {
 }
 
 pub fn validate_integer(a: &u8, b: &u8) -> Option<bool> {
-    if a < b {
-        Some(true)
-    } else if a == b {
-        None
-    } else {
-        Some(false)
+    match a.cmp(b) {
+        Ordering::Less => Some(true),
+        Ordering::Equal => None,
+        Ordering::Greater => Some(false),
     }
 }
 
@@ -28,9 +28,7 @@ pub fn validate_list(a: &List, b: &List) -> Option<bool> {
             break Some(true);
         } else if b_current.is_none() {
             break Some(false);
-        } else {
-            let a_current = a_current.unwrap();
-            let b_current = b_current.unwrap();
+        } else if let (Some(a_current), Some(b_current)) = (a_current, b_current) {
 
             let current_valid = if let (IntData(a_integer), IntData(b_integer)) = (a_current, b_current) {
                 validate_integer(a_integer, b_integer)
@@ -60,6 +58,8 @@ pub fn validate_list(a: &List, b: &List) -> Option<bool> {
             if current_valid.is_some() {
                 break current_valid;
             }
+        } else {
+            panic!("impossible");
         }
     }
 }
