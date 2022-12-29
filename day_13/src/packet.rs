@@ -1,12 +1,15 @@
 use pest::{Parser, iterators::Pair};
 use pest_derive::Parser;
 
+use crate::signal::{validate_packets, validate_list};
+
 #[derive(Parser)]
 #[grammar = "packet.pest"]
 pub struct PacketParser;
 
 pub type List = Vec<PacketData>;
 
+#[derive(Clone)]
 pub struct Packet {
     data: List,
 }
@@ -36,6 +39,30 @@ impl Packet {
     }
 }
 
+impl Eq for Packet {}
+
+impl PartialEq for Packet {
+    fn eq(&self, other: &Self) -> bool {
+        self.partial_cmp(other).unwrap().is_eq()
+    }
+}
+
+impl PartialOrd for Packet {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(match validate_list(&self.data(), &other.data()) {
+            Some(valid) => if valid { std::cmp::Ordering::Less } else { std::cmp::Ordering::Greater },
+            None => std::cmp::Ordering::Equal,
+        })
+    }
+}
+
+impl Ord for Packet {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.partial_cmp(other).unwrap()
+    }
+}
+
+#[derive(Clone)]
 pub enum PacketData {
     Integer(u8),
     List(List),
@@ -140,5 +167,58 @@ mod tests {
         validate_parsing("[1,[2,[3,[4,[5,6,7]]]],8,9]");
         validate_parsing("[1,[2,[3,[4,[5,6,0]]]],8,9]");
 
+    }
+
+    #[test]
+    fn sort() {
+        let mut packets = vec![
+            Packet::from("[1,1,3,1,1]"),
+            Packet::from("[1,1,5,1,1]"),
+            Packet::from("[[1],[2,3,4]]"),
+            Packet::from("[[1],4]"),
+            Packet::from("[9]"),
+            Packet::from("[[8,7,6]]"),
+            Packet::from("[[4,4],4,4]"),
+            Packet::from("[[4,4],4,4,4]"),
+            Packet::from("[7,7,7,7]"),
+            Packet::from("[7,7,7]"),
+            Packet::from("[]"),
+            Packet::from("[3]"),
+            Packet::from("[[[]]]"),
+            Packet::from("[[]]"),
+            Packet::from("[1,[2,[3,[4,[5,6,7]]]],8,9]"),
+            Packet::from("[1,[2,[3,[4,[5,6,0]]]],8,9]"),
+            Packet::from("[[2]]"),
+            Packet::from("[[6]]"),
+        ];
+
+        packets.sort();
+
+        let output = packets.iter()
+            .map(|p| p.to_string())
+            .collect::<Vec<_>>();
+        
+        assert_eq!(
+            "[]
+            [[]]
+            [[[]]]
+            [1,1,3,1,1]
+            [1,1,5,1,1]
+            [[1],[2,3,4]]
+            [1,[2,[3,[4,[5,6,0]]]],8,9]
+            [1,[2,[3,[4,[5,6,7]]]],8,9]
+            [[1],4]
+            [[2]]
+            [3]
+            [[4,4],4,4]
+            [[4,4],4,4,4]
+            [[6]]
+            [7,7,7]
+            [7,7,7,7]
+            [[8,7,6]]
+            [9]".split("\n").map(|s| s.trim().to_string())
+            .collect::<Vec<_>>(),
+            output
+        );
     }
 }

@@ -4,7 +4,7 @@ pub fn validate_packets(a: &Packet, b: &Packet) -> bool {
     validate_list(a.data(), b.data()).unwrap()
 }
 
-fn validate_integer(a: &u8, b: &u8) -> Option<bool> {
+pub fn validate_integer(a: &u8, b: &u8) -> Option<bool> {
     if a < b {
         Some(true)
     } else if a == b {
@@ -14,7 +14,7 @@ fn validate_integer(a: &u8, b: &u8) -> Option<bool> {
     }
 }
 
-fn validate_list(a: &List, b: &List) -> Option<bool> {
+pub fn validate_list(a: &List, b: &List) -> Option<bool> {
     let mut a_it = a.iter();
     let mut b_it = b.iter();
 
