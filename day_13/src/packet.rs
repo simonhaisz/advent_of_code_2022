@@ -1,5 +1,3 @@
-use std::cell::RefCell;
-
 use pest::{Parser, iterators::Pair};
 use pest_derive::Parser;
 
@@ -7,7 +5,7 @@ use pest_derive::Parser;
 #[grammar = "packet.pest"]
 pub struct PacketParser;
 
-type List = Vec<PacketData>;
+pub type List = Vec<PacketData>;
 
 pub struct Packet {
     data: List,
@@ -25,17 +23,14 @@ impl Packet {
         Packet { data }
     }
 
+    pub fn data(&self) -> &List {
+        &self.data
+    }
+
     pub fn to_string(&self) -> String {
         let mut output = String::new();
 
-        output.push('[');
-        for (i, d) in self.data.iter().enumerate() {
-            if i > 0 {
-                output.push(',');
-            }
-            d.write(&mut output);
-        }
-        output.push(']');
+        PacketData::write_list(&mut output, &self.data);
 
         output
     }
@@ -47,20 +42,40 @@ pub enum PacketData {
 }
 
 impl PacketData {
+    pub fn is_integer(&self) -> bool {
+        match self {
+            PacketData::Integer(_) => true,
+            PacketData::List(_) => false,
+        }
+    }
+
+    pub fn is_list(&self) -> bool {
+        match self {
+            PacketData::Integer(_) => false,
+            PacketData::List(_) => true,
+        }
+    }
+
     fn write(&self, output: &mut String) {
         match self {
-            PacketData::Integer(integer) => output.push_str(&format!("{}", integer)),
-            PacketData::List(list) => {
-                output.push('[');
-                for (i, data) in list.iter().enumerate() {
-                    if i > 0 {
-                        output.push(',');
-                    }
-                    data.write(output);
-                }
-                output.push(']');
-            },
+            PacketData::Integer(integer) => PacketData::write_integer(output, integer),
+            PacketData::List(list) => PacketData::write_list(output, list),
         }
+    }
+
+    fn write_integer(output: &mut String, integer: &u8) {
+        output.push_str(&format!("{}", integer))
+    }
+
+    fn write_list(output: &mut String, list: &[PacketData]) {
+        output.push('[');
+        for (i, data) in list.iter().enumerate() {
+            if i > 0 {
+                output.push(',');
+            }
+            data.write(output);
+        }
+        output.push(']');
     }
 }
 
