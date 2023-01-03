@@ -1,0 +1,52 @@
+WHITESPACE = _{
+    " "
+}
+
+integer = {
+    ASCII_DIGIT+
+}
+
+declaration = {
+    "Monkey" ~ integer ~ ":"
+}
+
+starting_items = {
+    "Starting" ~ "items:" ~ integer ~ ("," ~ integer)*
+}
+
+value = {
+    "old" | integer
+}
+
+op = {
+    "+" | "*"
+}
+
+operation = {
+    "Operation:" ~ "new" ~ "=" ~ "old" ~ op ~ value
+}
+
+test = {
+    "Test:" ~ "divisible" ~ "by" ~ integer
+}
+
+if_true = {
+    "If" ~ "true:" ~ "throw" ~ "to" ~ "monkey" ~ integer
+}
+
+if_false = {
+    "If" ~ "false:" ~ "throw" ~ "to" ~ "monkey" ~ integer
+}
+
+monkey = {
+    declaration ~ NEWLINE ~
+    starting_items ~ NEWLINE ~
+    operation ~ NEWLINE ~
+    test ~ NEWLINE ~
+    if_true ~ NEWLINE ~
+    if_false
+}
+
+monkeys = {
+    monkey ~ (NEWLINE ~ NEWLINE ~ monkey)*
+}
