@@ -1,5 +1,6 @@
 mod valve;
 mod network;
+mod traversal;
 
 use std::fs;
 
