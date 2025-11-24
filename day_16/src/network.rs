@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::valve::Valve;
 
 pub struct Network {
@@ -35,3 +37,14 @@ impl Network {
     }
 }
 
+pub type Graph<'a> = HashMap<(&'a str, &'a str), u32>;
+
+pub trait FloydWarshall {
+    fn run_floyd_warshal(&self) -> Graph;
+}
+
+impl FloydWarshall for Network {
+    fn run_floyd_warshal(&self) -> Graph {
+        todo!()
+    }
+}

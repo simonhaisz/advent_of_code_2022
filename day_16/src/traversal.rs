@@ -5,8 +5,10 @@ pub enum Action<'a> {
     Open,
 }
 
+const TOTAL_TIME: u32 = 30;
+
 pub fn traverse_network(network: &Network, actions: &[Action]) -> u32 {
-    let mut time_remaining = 30;
+    let mut time_remaining = TOTAL_TIME;
     let mut total_pressure_released = 0;
     let mut current = network.find("AA").unwrap();
 
@@ -30,6 +32,23 @@ pub fn traverse_network(network: &Network, actions: &[Action]) -> u32 {
     }
 
     total_pressure_released
+}
+
+pub fn navigate_network(network: &Network) -> Vec<Action> {
+    let mut actions = vec![];
+
+    let mut time_remaining = TOTAL_TIME;
+    let mut current = network.find("AA").unwrap();
+    let mut visited_tunnels = vec![current.name()];
+    let mut opened_valves = vec![];
+
+    loop {
+        
+    }
+
+
+
+    actions
 }
 
 #[cfg(test)]
